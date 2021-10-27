@@ -1,4 +1,21 @@
-void LCD5110_init(SPI_HandleTypeDef *hspi);
+typedef struct
+{
+	SPI_HandleTypeDef *hspi; //!Handle da SPI utilizada
+
+	GPIO_TypeDef* CS_Port; //!Porta do pino CS
+	uint16_t CS_Pin; //!Pino do CS
+
+	GPIO_TypeDef* DC_Port; //!Porta do pino CS
+	uint16_t DC_Pin; //!Pino do CS
+
+}LCD_HandleTypeDef;
+void LCD5110_init(LCD_HandleTypeDef *hlcd5110);
+
+void LCD5110_LCD_write(uint8_t *data, uint16_t tam, uint8_t mode);
+
+void LCD5110_drawchar(char c, uint8_t *dat);
+
+void LCD5110_drawchar_reg(char c, uint8_t *dat);
 
 void LCD5110_write_char(unsigned char c);
 

@@ -51,6 +51,7 @@
 
 /* USER CODE BEGIN PV */
 uint16_t a;
+LCD_HandleTypeDef hlcd; //Handler do Display Nokia5110
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -94,9 +95,21 @@ int main(void)
   MX_USART2_UART_Init();
   MX_SPI3_Init();
   /* USER CODE BEGIN 2 */
-  LCD5110_init(&hspi3);
+  //Inicialização da Instancia HLCD
+  hlcd.hspi=&hspi3;
+  hlcd.CS_Port=NK_CS_GPIO_Port;
+  hlcd.CS_Pin=NK_CS_Pin;
+  hlcd.DC_Port=NK_DO_GPIO_Port;
+  hlcd.DC_Pin=NK_DO_Pin;
+
+  LCD5110_init(&hlcd);
+  	LCD5110_clear();
   	LCD5110_set_XY(0, 0);
   	LCD5110_write_string("Micros é show - Testando ");
+  	LCD5110_set_XY(0, 4);
+  	LCD5110_write_char_reg('a');
+  	LCD5110_write_char('b');
+	LCD5110_write_char_reg('c');
   	HAL_Delay(DISP_DELAY);
   /* USER CODE END 2 */
 
@@ -104,9 +117,9 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	LCD5110_clear();
-   	LCD5110_set_XY(0,0);
-	  LCD5110_write_string("Micros é show - Testando ");
+//	LCD5110_clear();
+//   	LCD5110_set_XY(0,0);
+//	  LCD5110_write_string("Micros é show - Testando ");
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

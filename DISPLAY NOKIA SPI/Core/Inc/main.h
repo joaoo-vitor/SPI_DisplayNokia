@@ -72,18 +72,14 @@ void Error_Handler(void);
 #define NK_RST_GPIO_Port GPIOB
 #define NK_CS_Pin GPIO_PIN_12
 #define NK_CS_GPIO_Port GPIOB
-#define NK_SCK_Pin GPIO_PIN_13
-#define NK_SCK_GPIO_Port GPIOB
 #define NK_DO_Pin GPIO_PIN_14
 #define NK_DO_GPIO_Port GPIOB
-#define NK_DIB15_Pin GPIO_PIN_15
-#define NK_DIB15_GPIO_Port GPIOB
 #define TMS_Pin GPIO_PIN_13
 #define TMS_GPIO_Port GPIOA
 #define TCK_Pin GPIO_PIN_14
 #define TCK_GPIO_Port GPIOA
-#define NK_SCKC10_Pin GPIO_PIN_10
-#define NK_SCKC10_GPIO_Port GPIOC
+#define NK_SCK_Pin GPIO_PIN_10
+#define NK_SCK_GPIO_Port GPIOC
 #define SWO_Pin GPIO_PIN_3
 #define SWO_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */

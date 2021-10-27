@@ -4,6 +4,7 @@
 #include "font.h"
 
 #include "stm32f4xx_hal_spi.h"
+#include "stm32f4xx_hal_gpio.h"
 
 #define LCD_CS 	12 		//CE
 #define LCD_RST 10 		//RST
@@ -19,8 +20,10 @@
 #define false 0
 #define true 1
 
+#define TAM_MAX_STRING 100
+
  int scrbuf[504];
- SPI_HandleTypeDef *phspi;
+ LCD_HandleTypeDef *lcd;
 
 //Define the LCD Operation function
 void LCD5110_LCD_write_byte(unsigned char dat,unsigned char LCD5110_MOde);
@@ -35,20 +38,12 @@ void LCD5110_RST(unsigned char temp);
 void LCD5110_DC(unsigned char temp);
 
 
-
-
-
-void LCD5110_init(SPI_HandleTypeDef *hspi)
+void LCD5110_init(LCD_HandleTypeDef *hlcd5110)
 {
-	phspi=hspi;
-	//LCD5110_GPIO_Config();
+	lcd=hlcd5110;
 
-	LCD5110_DC(1);//LCD_DC = 1;
-	LCD5110_CS(1);//SPI_CS = 1;
-
-
-//	LCD5110_MO(1);//SPI_MO = 1;
-//	LCD5110_SCK(1);//SPI_SCK = 1;
+	HAL_GPIO_WritePin(lcd->DC_Port, lcd->DC_Pin,1);
+	HAL_GPIO_WritePin(lcd->CS_Port, lcd->CS_Pin, 1);
 
 	LCD5110_RST(0);//LCD_RST = 0;
 	LCD5110_LCD_delay_ms(10);
@@ -65,67 +60,92 @@ void LCD5110_init(SPI_HandleTypeDef *hspi)
 
 void LCD5110_LCD_write_byte(unsigned char dat,unsigned char mode)
 {
-	unsigned char i;
+	//Ativa (desliga) CS
+	HAL_GPIO_WritePin(lcd->CS_Port,lcd->CS_Pin, 0);
 
-	LCD5110_CS(0);//SPI_CS = 0;
+	//Seleção dados/comando
+	HAL_GPIO_WritePin(lcd->DC_Port, lcd->DC_Pin, mode);
 
-	if (0 == mode)
-		LCD5110_DC(0);//LCD_DC = 0;
-	else
-		LCD5110_DC(1);//LCD_DC = 1;
+	HAL_SPI_Transmit(lcd->hspi, &dat, 1,30000);
 
-
-//	for(i=0;i<8;i++)
-//	{
-//		LCD5110_MO(dat & 0x80);//SPI_MO = dat & 0x80;
-//		dat = dat<<1;
-//		LCD5110_SCK(0);//SPI_SCK = 0;
-//		LCD5110_SCK(1);//SPI_SCK = 1;
-//	}
-
-	HAL_SPI_Transmit(phspi, &dat, 1,30000);
-	LCD5110_CS(1);//SPI_CS = 1;
+	//Fim da transf.
+	HAL_GPIO_WritePin(lcd->CS_Port, lcd->CS_Pin, 1);
 
 }
 
+void LCD5110_LCD_write(uint8_t *data, uint16_t tam, uint8_t mode) //manda UM BLOCO (de qqr tamanho) PARA O DISPLAY
+{
+	//Ativa (desliga) CS
+	HAL_GPIO_WritePin(lcd->CS_Port,lcd->CS_Pin, 0);
+
+	//Seleção dados/comando
+	HAL_GPIO_WritePin(lcd->DC_Port, lcd->DC_Pin, mode);
+
+	HAL_SPI_Transmit(lcd->hspi, data, tam,30000);
+
+	//Fim da transf.
+	HAL_GPIO_WritePin(lcd->CS_Port, lcd->CS_Pin, 1);
+
+}
+void LCD5110_drawchar(char c, uint8_t *dat) //desenha o char e hospeda em dat
+{
+	uint8_t i; //indice do desenho
+
+	c = c - ' ';
+
+	for(i=0;i<6;i++)
+	{
+		*dat = font6_8[c][i];
+		dat++;
+		
+	}
+}
+void LCD5110_drawchar_reg(char c, uint8_t *dat) //desenha o char e hospeda em dat
+{
+	uint8_t i; //indice do desenho
+
+	c = c - ' ';
+
+	for(i=0;i<6;i++)
+	{
+		*dat = ~font6_8[c][i];
+		dat++;
+
+	}
+}
 void LCD5110_write_char(unsigned char c)
 {
-	unsigned char line;
-	unsigned char ch = 0;
-
-	c = c - 32;
-
-	for(line=0;line<6;line++)
-	{
-		ch = font6_8[c][line];
-		LCD5110_LCD_write_byte(ch,1);
-		
-	}
+	uint8_t caract[6]; //onde sera hospedado o desenho do caract.
+	LCD5110_drawchar(c, caract);
+	LCD5110_LCD_write(caract, 6, 1);
 }
-void LCD5110_write_char_reg(unsigned char c)
+void LCD5110_write_char_reg(unsigned char c)//TESTARRRR
 {
-	unsigned char line;
-	unsigned char ch = 0;
-
-	c = c - 32;
-
-	for(line=0;line<6;line++)
-	{
-		ch = ~font6_8[c][line];
-		LCD5110_LCD_write_byte(ch,1);
-		
-	}
+	uint8_t caract[6]; //onde sera hospedado o desenho do caract.
+	LCD5110_drawchar_reg(c, caract);
+	LCD5110_LCD_write(caract, 6,1);
 }
 
 void LCD5110_write_string(char *s)
 {
-	unsigned char ch;
-  	while(*s!='\0')
+	uint8_t strf[6*TAM_MAX_STRING];
+	uint16_t tam=0;
+	uint8_t *c;
+	/*Ponteiro para onde ficará hospedada a data (desenho do
+	  display (strf).
+	*/
+
+	c = strf;
+	while(*s!='\0')
 	{
-		ch = *s;
-		LCD5110_write_char(ch);
-		s++;
+		LCD5110_drawchar(*s,c);
+		/*Desloca buffer nos dois lugares
+		 */
+		s++;  //proxima letra da string
+		c+=6; //proximo desenho de char no strf
+		tam+=6;//cada letra soma 6 bytes
 	}
+	LCD5110_LCD_write(strf, tam,1);
 }
 
 
