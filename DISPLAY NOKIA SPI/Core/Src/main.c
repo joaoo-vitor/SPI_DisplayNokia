@@ -19,6 +19,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "spi.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -27,11 +28,8 @@
 
 #include "stm32f4xx.h"
 #include <stdio.h>
-//#include <string.h>
 #include "LCD.h"
 #include "imagem.h"
-//#include "grafic.h"
-#include "boneco.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -94,6 +92,7 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART2_UART_Init();
+  MX_SPI3_Init();
   /* USER CODE BEGIN 2 */
   LCD5110_init();
   	LCD5110_set_XY(0, 0);
@@ -105,28 +104,9 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-//	  LCD5110_clear();
-//	  	   	LCD5110_set_XY(0,0);
-//	  	   	LCD5110_write_string("ABCDEFGHIJKLMNOPWRSTUVXYZ   abcdefghijklmnopqrstuvxyz   1234567890");
-//
-//
-//	  	   	HAL_Delay(DISP_DELAY);
-//	  		LCD5110_clear();
-//	  		LCD5110_set_XY(0,0);
-//
-//	  		for (a=0;a<=500;a++){
-//	  			LCD5110_LCD_write_byte(liber_bmp2[a],1);
-//
-//
-//
-//	  		}
-//	  		HAL_Delay(DISP_DELAY);
-//	  		LCD5110_clear();
-//	  		LCD5110_set_XY(0,0);
-//	  		for (a=0;a<=500;a++){
-//	  			LCD5110_LCD_write_byte(liber_bmp3[a],1);
-//	  		}
-//	  		HAL_Delay(DISP_DELAY);
+	LCD5110_clear();
+   	LCD5110_set_XY(0,0);
+	  LCD5110_write_string("Micros é show - Testando ");
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

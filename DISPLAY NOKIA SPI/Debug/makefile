@@ -61,8 +61,8 @@ all: main-build
 main-build: DISPLAY\ NOKIA\ SPI.elf secondary-outputs
 
 # Tool invocations
-DISPLAY\ NOKIA\ SPI.elf: $(OBJS) $(USER_OBJS) C:\Users\joao.vitor\STM32CubeIDE\workspace_1.7.0\SPI_DisplayNokia\SPI_DisplayNokia\DISPLAY\ NOKIA\ SPI\STM32F446RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "DISPLAY NOKIA SPI.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\joao.vitor\STM32CubeIDE\workspace_1.7.0\SPI_DisplayNokia\SPI_DisplayNokia\DISPLAY NOKIA SPI\STM32F446RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="DISPLAY NOKIA SPI.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+DISPLAY\ NOKIA\ SPI.elf: $(OBJS) $(USER_OBJS) C:\Users\joao.vitor\STM32CubeIDE\workspace_1.7.0\SPI_DisplayNokia\DISPLAY\ NOKIA\ SPI\STM32F446RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "DISPLAY NOKIA SPI.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\joao.vitor\STM32CubeIDE\workspace_1.7.0\SPI_DisplayNokia\DISPLAY NOKIA SPI\STM32F446RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="DISPLAY NOKIA SPI.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
