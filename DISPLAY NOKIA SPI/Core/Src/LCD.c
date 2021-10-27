@@ -3,8 +3,7 @@
 #include "LCD.h"
 #include "font.h"
 
-
-#include "spi.h"
+#include "stm32f4xx_hal_spi.h"
 
 #define LCD_CS 	12 		//CE
 #define LCD_RST 10 		//RST
@@ -21,7 +20,7 @@
 #define true 1
 
  int scrbuf[504];
-
+ SPI_HandleTypeDef *phspi;
 
 //Define the LCD Operation function
 void LCD5110_LCD_write_byte(unsigned char dat,unsigned char LCD5110_MOde);
@@ -39,9 +38,9 @@ void LCD5110_DC(unsigned char temp);
 
 
 
-void LCD5110_init()
+void LCD5110_init(SPI_HandleTypeDef *hspi)
 {
-
+	phspi=hspi;
 	//LCD5110_GPIO_Config();
 
 	LCD5110_DC(1);//LCD_DC = 1;
@@ -51,9 +50,9 @@ void LCD5110_init()
 //	LCD5110_MO(1);//SPI_MO = 1;
 //	LCD5110_SCK(1);//SPI_SCK = 1;
 
-//	LCD5110_RST(0);//LCD_RST = 0;
-//	LCD5110_LCD_delay_ms(10);
-//	LCD5110_RST(1);//LCD_RST = 1;
+	LCD5110_RST(0);//LCD_RST = 0;
+	LCD5110_LCD_delay_ms(10);
+	LCD5110_RST(1);//LCD_RST = 1;
 
 	LCD5110_LCD_write_byte(0x21,0);
 	LCD5110_LCD_write_byte(0xC0,0); //B6, c0
@@ -84,7 +83,7 @@ void LCD5110_LCD_write_byte(unsigned char dat,unsigned char mode)
 //		LCD5110_SCK(1);//SPI_SCK = 1;
 //	}
 
-	HAL_SPI_Transmit(&hspi3, &dat, 1,30000);
+	HAL_SPI_Transmit(phspi, &dat, 1,30000);
 	LCD5110_CS(1);//SPI_CS = 1;
 
 }
@@ -199,12 +198,12 @@ void LCD5110_CS(unsigned char temp)
 
 }
 
-//void LCD5110_RST(unsigned char temp)
-//{
-//	if (temp) PORT->ODR|=1<<LCD_RST;
-//	else PORT->ODR&=~(1<<LCD_RST);
-//
-//}
+void LCD5110_RST(unsigned char temp)
+{
+	if (temp) PORT->ODR|=1<<LCD_RST;
+	else PORT->ODR&=~(1<<LCD_RST);
+
+}
 
 void LCD5110_DC(unsigned char temp)
 {

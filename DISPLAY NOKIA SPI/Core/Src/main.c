@@ -94,7 +94,7 @@ int main(void)
   MX_USART2_UART_Init();
   MX_SPI3_Init();
   /* USER CODE BEGIN 2 */
-  LCD5110_init();
+  LCD5110_init(&hspi3);
   	LCD5110_set_XY(0, 0);
   	LCD5110_write_string("Micros é show - Testando ");
   	HAL_Delay(DISP_DELAY);
