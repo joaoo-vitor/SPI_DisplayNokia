@@ -37,13 +37,13 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  16 .debug_macro  00021b90  00000000  00000000  00031e40  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   0000deaf  00000000  00000000  000539d0  2**0
+ 17 .debug_line   0000deb3  00000000  00000000  000539d0  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    000ca797  00000000  00000000  0006187f  2**0
+ 18 .debug_str    000ca787  00000000  00000000  00061883  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000053  00000000  00000000  0012c016  2**0
+ 19 .comment      00000053  00000000  00000000  0012c00a  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  00002a00  00000000  00000000  0012c06c  2**2
+ 20 .debug_frame  00002a00  00000000  00000000  0012c060  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -452,10 +452,10 @@ void LCD5110_init(LCD_HandleTypeDef *hlcd5110)
  80005a0:	20000250 	.word	0x20000250
  80005a4:	2000044c 	.word	0x2000044c
 
-080005a8 <LCD5110_LCD_write>:
+080005a8 <LCD_write>:
 
 
-void LCD5110_LCD_write(uint8_t *data, uint16_t tam, uint8_t mode) //manda UM BLOCO (de qqr tamanho) PARA O DISPLAY
+void LCD_write(uint8_t *data, uint16_t tam, uint8_t mode) //manda UM BLOCO (de qqr tamanho) PARA O DISPLAY
 {
  80005a8:	b580      	push	{r7, lr}
  80005aa:	b082      	sub	sp, #8
@@ -467,10 +467,10 @@ void LCD5110_LCD_write(uint8_t *data, uint16_t tam, uint8_t mode) //manda UM BLO
  80005b6:	707b      	strb	r3, [r7, #1]
 	//Ativa (desliga) CS
 	HAL_GPIO_WritePin(lcd->CS_Port,lcd->CS_Pin, 0);
- 80005b8:	4b15      	ldr	r3, [pc, #84]	; (8000610 <LCD5110_LCD_write+0x68>)
+ 80005b8:	4b15      	ldr	r3, [pc, #84]	; (8000610 <LCD_write+0x68>)
  80005ba:	681b      	ldr	r3, [r3, #0]
  80005bc:	6858      	ldr	r0, [r3, #4]
- 80005be:	4b14      	ldr	r3, [pc, #80]	; (8000610 <LCD5110_LCD_write+0x68>)
+ 80005be:	4b14      	ldr	r3, [pc, #80]	; (8000610 <LCD_write+0x68>)
  80005c0:	681b      	ldr	r3, [r3, #0]
  80005c2:	891b      	ldrh	r3, [r3, #8]
  80005c4:	2200      	movs	r2, #0
@@ -479,10 +479,10 @@ void LCD5110_LCD_write(uint8_t *data, uint16_t tam, uint8_t mode) //manda UM BLO
 
 	//Seleção dados/comando
 	HAL_GPIO_WritePin(lcd->DC_Port, lcd->DC_Pin, mode);
- 80005cc:	4b10      	ldr	r3, [pc, #64]	; (8000610 <LCD5110_LCD_write+0x68>)
+ 80005cc:	4b10      	ldr	r3, [pc, #64]	; (8000610 <LCD_write+0x68>)
  80005ce:	681b      	ldr	r3, [r3, #0]
  80005d0:	68d8      	ldr	r0, [r3, #12]
- 80005d2:	4b0f      	ldr	r3, [pc, #60]	; (8000610 <LCD5110_LCD_write+0x68>)
+ 80005d2:	4b0f      	ldr	r3, [pc, #60]	; (8000610 <LCD_write+0x68>)
  80005d4:	681b      	ldr	r3, [r3, #0]
  80005d6:	8a1b      	ldrh	r3, [r3, #16]
  80005d8:	787a      	ldrb	r2, [r7, #1]
@@ -490,7 +490,7 @@ void LCD5110_LCD_write(uint8_t *data, uint16_t tam, uint8_t mode) //manda UM BLO
  80005dc:	f000 ffb6 	bl	800154c <HAL_GPIO_WritePin>
 
 	HAL_SPI_Transmit(lcd->hspi, data, tam,30000);
- 80005e0:	4b0b      	ldr	r3, [pc, #44]	; (8000610 <LCD5110_LCD_write+0x68>)
+ 80005e0:	4b0b      	ldr	r3, [pc, #44]	; (8000610 <LCD_write+0x68>)
  80005e2:	681b      	ldr	r3, [r3, #0]
  80005e4:	6818      	ldr	r0, [r3, #0]
  80005e6:	887a      	ldrh	r2, [r7, #2]
@@ -500,10 +500,10 @@ void LCD5110_LCD_write(uint8_t *data, uint16_t tam, uint8_t mode) //manda UM BLO
 
 	//Fim da transf.
 	HAL_GPIO_WritePin(lcd->CS_Port, lcd->CS_Pin, 1);
- 80005f2:	4b07      	ldr	r3, [pc, #28]	; (8000610 <LCD5110_LCD_write+0x68>)
+ 80005f2:	4b07      	ldr	r3, [pc, #28]	; (8000610 <LCD_write+0x68>)
  80005f4:	681b      	ldr	r3, [r3, #0]
  80005f6:	6858      	ldr	r0, [r3, #4]
- 80005f8:	4b05      	ldr	r3, [pc, #20]	; (8000610 <LCD5110_LCD_write+0x68>)
+ 80005f8:	4b05      	ldr	r3, [pc, #20]	; (8000610 <LCD_write+0x68>)
  80005fa:	681b      	ldr	r3, [r3, #0]
  80005fc:	891b      	ldrh	r3, [r3, #8]
  80005fe:	2201      	movs	r2, #1
@@ -518,8 +518,8 @@ void LCD5110_LCD_write(uint8_t *data, uint16_t tam, uint8_t mode) //manda UM BLO
  800060e:	bf00      	nop
  8000610:	20000250 	.word	0x20000250
 
-08000614 <LCD5110_drawchar>:
-void LCD5110_drawchar(char c, uint8_t *dat) //desenha o char e hospeda em dat
+08000614 <LCD_drawchar>:
+void LCD_drawchar(char c, uint8_t *dat) //desenha o char e hospeda em dat
 {
  8000614:	b480      	push	{r7}
  8000616:	b085      	sub	sp, #20
@@ -537,12 +537,12 @@ void LCD5110_drawchar(char c, uint8_t *dat) //desenha o char e hospeda em dat
 	for(i=0;i<6;i++)
  8000626:	2300      	movs	r3, #0
  8000628:	73fb      	strb	r3, [r7, #15]
- 800062a:	e011      	b.n	8000650 <LCD5110_drawchar+0x3c>
+ 800062a:	e011      	b.n	8000650 <LCD_drawchar+0x3c>
 	{
 		*dat = font6_8[c][i];
  800062c:	79fa      	ldrb	r2, [r7, #7]
  800062e:	7bf9      	ldrb	r1, [r7, #15]
- 8000630:	480c      	ldr	r0, [pc, #48]	; (8000664 <LCD5110_drawchar+0x50>)
+ 8000630:	480c      	ldr	r0, [pc, #48]	; (8000664 <LCD_drawchar+0x50>)
  8000632:	4613      	mov	r3, r2
  8000634:	005b      	lsls	r3, r3, #1
  8000636:	4413      	add	r3, r2
@@ -562,7 +562,7 @@ void LCD5110_drawchar(char c, uint8_t *dat) //desenha o char e hospeda em dat
  800064e:	73fb      	strb	r3, [r7, #15]
  8000650:	7bfb      	ldrb	r3, [r7, #15]
  8000652:	2b05      	cmp	r3, #5
- 8000654:	d9ea      	bls.n	800062c <LCD5110_drawchar+0x18>
+ 8000654:	d9ea      	bls.n	800062c <LCD_drawchar+0x18>
 		
 	}
 }
@@ -574,8 +574,8 @@ void LCD5110_drawchar(char c, uint8_t *dat) //desenha o char e hospeda em dat
  8000662:	4770      	bx	lr
  8000664:	20000000 	.word	0x20000000
 
-08000668 <LCD5110_drawchar_reg>:
-void LCD5110_drawchar_reg(char c, uint8_t *dat) //desenha o char invertido
+08000668 <LCD_drawchar_inv>:
+void LCD_drawchar_inv(char c, uint8_t *dat) //desenha o char invertido
 {
  8000668:	b480      	push	{r7}
  800066a:	b085      	sub	sp, #20
@@ -593,12 +593,12 @@ void LCD5110_drawchar_reg(char c, uint8_t *dat) //desenha o char invertido
 	for(i=0;i<6;i++)
  800067a:	2300      	movs	r3, #0
  800067c:	73fb      	strb	r3, [r7, #15]
- 800067e:	e013      	b.n	80006a8 <LCD5110_drawchar_reg+0x40>
+ 800067e:	e013      	b.n	80006a8 <LCD_drawchar_inv+0x40>
 	{
 		*dat = ~font6_8[c][i];
  8000680:	79fa      	ldrb	r2, [r7, #7]
  8000682:	7bf9      	ldrb	r1, [r7, #15]
- 8000684:	480d      	ldr	r0, [pc, #52]	; (80006bc <LCD5110_drawchar_reg+0x54>)
+ 8000684:	480d      	ldr	r0, [pc, #52]	; (80006bc <LCD_drawchar_inv+0x54>)
  8000686:	4613      	mov	r3, r2
  8000688:	005b      	lsls	r3, r3, #1
  800068a:	4413      	add	r3, r2
@@ -620,7 +620,7 @@ void LCD5110_drawchar_reg(char c, uint8_t *dat) //desenha o char invertido
  80006a6:	73fb      	strb	r3, [r7, #15]
  80006a8:	7bfb      	ldrb	r3, [r7, #15]
  80006aa:	2b05      	cmp	r3, #5
- 80006ac:	d9e8      	bls.n	8000680 <LCD5110_drawchar_reg+0x18>
+ 80006ac:	d9e8      	bls.n	8000680 <LCD_drawchar_inv+0x18>
 
 	}
 }
@@ -647,7 +647,7 @@ void LCD5110_write_char(unsigned char c, uint8_t invert)
 	 * invert diz se vai inverter o caract, c é o caract
 	 */
 	uint8_t caract[6]; //onde sera hospedado o desenho do caract.
-	if (invert) LCD5110_drawchar_reg(c, caract);
+	if (invert) LCD_drawchar_inv(c, caract);
  80006d0:	79bb      	ldrb	r3, [r7, #6]
  80006d2:	2b00      	cmp	r3, #0
  80006d4:	d007      	beq.n	80006e6 <LCD5110_write_char+0x26>
@@ -655,20 +655,20 @@ void LCD5110_write_char(unsigned char c, uint8_t invert)
  80006da:	79fb      	ldrb	r3, [r7, #7]
  80006dc:	4611      	mov	r1, r2
  80006de:	4618      	mov	r0, r3
- 80006e0:	f7ff ffc2 	bl	8000668 <LCD5110_drawchar_reg>
+ 80006e0:	f7ff ffc2 	bl	8000668 <LCD_drawchar_inv>
  80006e4:	e006      	b.n	80006f4 <LCD5110_write_char+0x34>
-	else LCD5110_drawchar(c, caract);
+	else LCD_drawchar(c, caract);
  80006e6:	f107 0208 	add.w	r2, r7, #8
  80006ea:	79fb      	ldrb	r3, [r7, #7]
  80006ec:	4611      	mov	r1, r2
  80006ee:	4618      	mov	r0, r3
- 80006f0:	f7ff ff90 	bl	8000614 <LCD5110_drawchar>
-	LCD5110_LCD_write(caract, 6, 1);
+ 80006f0:	f7ff ff90 	bl	8000614 <LCD_drawchar>
+	LCD_write(caract, 6, 1);
  80006f4:	f107 0308 	add.w	r3, r7, #8
  80006f8:	2201      	movs	r2, #1
  80006fa:	2106      	movs	r1, #6
  80006fc:	4618      	mov	r0, r3
- 80006fe:	f7ff ff53 	bl	80005a8 <LCD5110_LCD_write>
+ 80006fe:	f7ff ff53 	bl	80005a8 <LCD_write>
 }
  8000702:	bf00      	nop
  8000704:	3710      	adds	r7, #16
@@ -699,12 +699,12 @@ void LCD5110_write_string(char *s)
 	while(*s!='\0')
  800071c:	e00e      	b.n	800073c <LCD5110_write_string+0x30>
 	{
-		LCD5110_drawchar(*s,c);
+		LCD_drawchar(*s,c);
  800071e:	687b      	ldr	r3, [r7, #4]
  8000720:	781b      	ldrb	r3, [r3, #0]
  8000722:	68b9      	ldr	r1, [r7, #8]
  8000724:	4618      	mov	r0, r3
- 8000726:	f7ff ff75 	bl	8000614 <LCD5110_drawchar>
+ 8000726:	f7ff ff75 	bl	8000614 <LCD_drawchar>
 		/*Desloca buffer nos dois lugares
 		 */
 		s++;  //proxima letra da string
@@ -725,12 +725,12 @@ void LCD5110_write_string(char *s)
  8000740:	2b00      	cmp	r3, #0
  8000742:	d1ec      	bne.n	800071e <LCD5110_write_string+0x12>
 	}
-	LCD5110_LCD_write(buff, tam,1);
+	LCD_write(buff, tam,1);
  8000744:	89fb      	ldrh	r3, [r7, #14]
  8000746:	2201      	movs	r2, #1
  8000748:	4619      	mov	r1, r3
  800074a:	4803      	ldr	r0, [pc, #12]	; (8000758 <LCD5110_write_string+0x4c>)
- 800074c:	f7ff ff2c 	bl	80005a8 <LCD5110_LCD_write>
+ 800074c:	f7ff ff2c 	bl	80005a8 <LCD_write>
 }
  8000750:	bf00      	nop
  8000752:	3710      	adds	r7, #16
@@ -744,11 +744,11 @@ void LCD5110_clear()
 {
  800075c:	b580      	push	{r7, lr}
  800075e:	af00      	add	r7, sp, #0
-	LCD5110_LCD_write(telaLimpa, TAM_TELA, 1);
+	LCD_write(telaLimpa, TAM_TELA, 1);
  8000760:	2201      	movs	r2, #1
  8000762:	f44f 71fc 	mov.w	r1, #504	; 0x1f8
  8000766:	4802      	ldr	r0, [pc, #8]	; (8000770 <LCD5110_clear+0x14>)
- 8000768:	f7ff ff1e 	bl	80005a8 <LCD5110_LCD_write>
+ 8000768:	f7ff ff1e 	bl	80005a8 <LCD_write>
 }
  800076c:	bf00      	nop
  800076e:	bd80      	pop	{r7, pc}
@@ -1179,11 +1179,11 @@ int main(void)
  8000a0e:	f000 fab1 	bl	8000f74 <HAL_Delay>
 	  	LCD5110_clear();
  8000a12:	f7ff fea3 	bl	800075c <LCD5110_clear>
-	  	  	LCD5110_set_XY(0, 3);
+    	 LCD5110_set_XY(0, 3);
  8000a16:	2103      	movs	r1, #3
  8000a18:	2000      	movs	r0, #0
  8000a1a:	f7ff feab 	bl	8000774 <LCD5110_set_XY>
-	  	  	LCD5110_write_char('m',1);
+	   	LCD5110_write_char('m',1);
  8000a1e:	2101      	movs	r1, #1
  8000a20:	206d      	movs	r0, #109	; 0x6d
  8000a22:	f7ff fe4d 	bl	80006c0 <LCD5110_write_char>

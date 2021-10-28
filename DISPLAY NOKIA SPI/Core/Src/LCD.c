@@ -31,6 +31,7 @@ static uint8_t buff[TAM_BUFF]; //!espaço de memória auxiliarr
 uint8_t telaLimpa[TAM_TELA];
 /*array para limpar tela
  * é preenchida no INIT
+ * não é const para poder receber assign
  */
 
 //Define the LCD Operation function
@@ -68,7 +69,7 @@ void LCD5110_init(LCD_HandleTypeDef *hlcd5110)
 }
 
 
-void LCD5110_LCD_write(uint8_t *data, uint16_t tam, uint8_t mode) //manda UM BLOCO (de qqr tamanho) PARA O DISPLAY
+void LCD_write(uint8_t *data, uint16_t tam, uint8_t mode) //manda UM BLOCO (de qqr tamanho) PARA O DISPLAY
 {
 	//Ativa (desliga) CS
 	HAL_GPIO_WritePin(lcd->CS_Port,lcd->CS_Pin, 0);
@@ -82,7 +83,7 @@ void LCD5110_LCD_write(uint8_t *data, uint16_t tam, uint8_t mode) //manda UM BLO
 	HAL_GPIO_WritePin(lcd->CS_Port, lcd->CS_Pin, 1);
 
 }
-void LCD5110_drawchar(char c, uint8_t *dat) //desenha o char e hospeda em dat
+void LCD_drawchar(char c, uint8_t *dat) //desenha o char e hospeda em dat
 {
 	uint8_t i; //indice do desenho
 
@@ -95,7 +96,7 @@ void LCD5110_drawchar(char c, uint8_t *dat) //desenha o char e hospeda em dat
 		
 	}
 }
-void LCD5110_drawchar_reg(char c, uint8_t *dat) //desenha o char invertido
+void LCD_drawchar_inv(char c, uint8_t *dat) //desenha o char invertido
 {
 	uint8_t i; //indice do desenho
 
@@ -114,9 +115,9 @@ void LCD5110_write_char(unsigned char c, uint8_t invert)
 	 * invert diz se vai inverter o caract, c é o caract
 	 */
 	uint8_t caract[6]; //onde sera hospedado o desenho do caract.
-	if (invert) LCD5110_drawchar_reg(c, caract);
-	else LCD5110_drawchar(c, caract);
-	LCD5110_LCD_write(caract, 6, 1);
+	if (invert) LCD_drawchar_inv(c, caract);
+	else LCD_drawchar(c, caract);
+	LCD_write(caract, 6, 1);
 }
 
 void LCD5110_write_string(char *s)
@@ -131,19 +132,19 @@ void LCD5110_write_string(char *s)
 	c = buff;
 	while(*s!='\0')
 	{
-		LCD5110_drawchar(*s,c);
+		LCD_drawchar(*s,c);
 		/*Desloca buffer nos dois lugares
 		 */
 		s++;  //proxima letra da string
 		c+=LARG_CHAR; //proximo desenho de char no strf
 		tam+=LARG_CHAR;//cada letra soma 6 bytes
 	}
-	LCD5110_LCD_write(buff, tam,1);
+	LCD_write(buff, tam,1);
 }
 
 void LCD5110_clear()
 {
-	LCD5110_LCD_write(telaLimpa, TAM_TELA, 1);
+	LCD_write(telaLimpa, TAM_TELA, 1);
 }
 
 void LCD5110_set_XY(unsigned char X,unsigned char Y)

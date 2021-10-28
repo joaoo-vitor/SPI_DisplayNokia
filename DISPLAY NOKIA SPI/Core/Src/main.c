@@ -118,8 +118,8 @@ int main(void)
 		LCD5110_write_char('c',1);
 	  	HAL_Delay(DISP_DELAY);
 	  	LCD5110_clear();
-	  	  	LCD5110_set_XY(0, 3);
-	  	  	LCD5110_write_char('m',1);
+    	 LCD5110_set_XY(0, 3);
+	   	LCD5110_write_char('m',1);
 	  	  	LCD5110_write_char('i',0);
 	  		LCD5110_write_char('c',1);
 	  		LCD5110_write_char('r',1);

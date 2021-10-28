@@ -22,15 +22,13 @@ typedef struct
 
 void LCD5110_init(LCD_HandleTypeDef *hlcd5110);
 
-void LCD5110_LCD_write(uint8_t *data, uint16_t tam, uint8_t mode);
+void LCD_write(uint8_t *data, uint16_t tam, uint8_t mode);
 
-void LCD5110_drawchar(char c, uint8_t *dat);
+void LCD_drawchar(char c, uint8_t *dat);
 
-void LCD5110_drawchar_reg(char c, uint8_t *dat);
+void LCD_drawchar_inv(char c, uint8_t *dat);
 
 void LCD5110_write_char(unsigned char c, uint8_t invert);
-
-void LCD5110_write_char_reg(unsigned char c);
 
 void LCD5110_clear(void);
 
