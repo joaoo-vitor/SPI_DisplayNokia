@@ -103,23 +103,29 @@ int main(void)
   hlcd.DC_Pin=NK_DO_Pin;
 
   LCD5110_init(&hlcd);
-  	LCD5110_clear();
-  	LCD5110_set_XY(0, 0);
-  	LCD5110_write_string("Micros é show - Testando ");
-  	LCD5110_set_XY(0, 4);
-  	LCD5110_write_char_reg('a');
-  	LCD5110_write_char('b');
-	LCD5110_write_char_reg('c');
-  	HAL_Delay(DISP_DELAY);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-//	LCD5110_clear();
-//   	LCD5110_set_XY(0,0);
-//	  LCD5110_write_string("Micros é show - Testando ");
+		LCD5110_set_XY(0, 0);
+	  	LCD5110_write_string("Micros é show - Testando ");
+	  	LCD5110_set_XY(0, 4);
+	  	LCD5110_write_char('a',1);
+	  	LCD5110_write_char('b',0);
+		LCD5110_write_char('c',1);
+	  	HAL_Delay(DISP_DELAY);
+	  	LCD5110_clear();
+	  	  	LCD5110_set_XY(0, 3);
+	  	  	LCD5110_write_char('m',1);
+	  	  	LCD5110_write_char('i',0);
+	  		LCD5110_write_char('c',1);
+	  		LCD5110_write_char('r',1);
+	  		LCD5110_write_char('o',0);
+	  		LCD5110_write_char('s',1);
+	  	  	HAL_Delay(DISP_DELAY);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
