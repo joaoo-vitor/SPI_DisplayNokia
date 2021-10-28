@@ -24,9 +24,18 @@
 #define TAM_BUFF 504
 #define LARG_CHAR 6
 
+typedef enum {B_FREE=0,B_BUSY} BufStatus_t;
+
+typedef struct{
+	uint8_t dado[TAM_BUFF];
+	BufStatus_t estado;
+	uint8_t ocupacao;
+}BufferCompartilhado_t;
+
  int scrbuf[504];
 static LCD_HandleTypeDef *lcd; //!handler display
-static uint8_t buff[TAM_BUFF]; //!espaço de memória auxiliarr
+
+static BufferCompartilhado_t buf;
 
 uint8_t telaLimpa[TAM_TELA];
 /*array para limpar tela
@@ -51,6 +60,9 @@ void LCD5110_init(LCD_HandleTypeDef *hlcd5110)
 	for (int i=0; i<TAM_TELA;i++){
 		telaLimpa[i]=0;
 	}
+	//incializa buffer
+	buf.ocupacao=0;
+	buf.estado=B_FREE;
 
 	HAL_GPIO_WritePin(lcd->DC_Port, lcd->DC_Pin,1);
 	HAL_GPIO_WritePin(lcd->CS_Port, lcd->CS_Pin, 1);
@@ -104,7 +116,7 @@ void LCD_drawchar_inv(char c, uint8_t *dat) //desenha o char invertido
 
 	for(i=0;i<6;i++)
 	{
-		*dat = ~font6_8[c][i];
+		*dat = ~font6_8[c][i]; //caract invertido (~)
 		dat++;
 
 	}
@@ -120,7 +132,15 @@ void LCD5110_write_char(unsigned char c, uint8_t invert)
 	LCD_write(caract, 6, 1);
 }
 
-void LCD5110_write_string(char *s)
+/*
+ * Função retorna o estado, se for busy significa que não
+ * deu certo a transmissão por causa que o buffer estava ocupado,
+ * o que se mostra um dos contras de usar modo não bloqueante,  que
+ * traz mais velocidade (eficiência). Portanto, a única coisa que
+ * a função fará é retornar esse valor, e o usuário que decidirá
+ * o que fazer com isso.
+ */
+HAL_StatusTypeDef LCD5110_write_string(char *s)
 {
 
 	uint16_t tam=0;
@@ -129,7 +149,11 @@ void LCD5110_write_string(char *s)
 	  display (buff).
 	*/
 
-	c = buff;
+	if(buf.estado==B_BUSY) //se buffer estiver ocupado, retorna estado
+		return HAL_BUSY;
+
+	buf.estado=B_BUSY; //se não der o return, virá ocupado
+	c = buf.dado;
 	while(*s!='\0')
 	{
 		LCD_drawchar(*s,c);
@@ -139,7 +163,10 @@ void LCD5110_write_string(char *s)
 		c+=LARG_CHAR; //proximo desenho de char no strf
 		tam+=LARG_CHAR;//cada letra soma 6 bytes
 	}
-	LCD_write(buff, tam,1);
+	buf.ocupacao=tam; //atualiza o tamanho do buffer
+	LCD_write(buf.dado,buf.ocupacao,1);
+	buf.estado=B_FREE; //sinaliza que buffer está livre
+	return HAL_OK; //se buffer n estiver ocupado, retorna estado
 }
 
 void LCD5110_clear()
