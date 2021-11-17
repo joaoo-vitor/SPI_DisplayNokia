@@ -93,7 +93,7 @@ void LCD_drawchar_inv(char c, uint8_t *dat);
 
 HAL_StatusTypeDef LCD5110_write_char(unsigned char c, uint8_t invert);
 
-HAL_StatusTypeDef LCD5110_clear();
+HAL_StatusTypeDef LCD5110_clear(void);
 
 HAL_StatusTypeDef LCD5110_write_block(uint8_t *img, uint16_t tam);
 

@@ -58,10 +58,11 @@ void LCD5110_init(LCD_HandleTypeDef *hlcd5110) {
 	buffer[4] = LCD5110_FUNCTIONSET; //x20
 	buffer[5] = (LCD5110_DISPLAYCONTROL | LCD5110_DISPLAYNORMAL); //x0C
 
-	while (buf.estado == B_BUSY);
+	while (buf.estado == B_BUSY);//garanto que o clear ja terminou
 	buf.ocupacao=6;
 	buf.estado=B_BUSY;
 	LCD_write(&buf, LCD_COMMAND);
+	while (buf.estado == B_BUSY); //garanto que terminei a config ao final
 }
 
 void LCD_write_b(uint8_t *data, uint16_t tam, uint8_t mode) //manda UM BLOCO (de qqr tamanho) PARA O DISPLAY
@@ -132,7 +133,7 @@ HAL_StatusTypeDef LCD5110_write_char(unsigned char c, uint8_t invert) {
 		return HAL_BUSY;
 
 	buf.estado = B_BUSY; //se não der o return, vira ocupado
-	caract = buffer;
+	caract = buf.dado;
 
 	/*
 	 * invert diz se vai inverter o caract, c é o caract
@@ -159,7 +160,7 @@ HAL_StatusTypeDef LCD5110_write_string(char *s) {
 		return HAL_BUSY;
 	buf.estado = B_BUSY; //se não der o return, virá ocupado
 
-	c = buffer;
+	c = buf.dado;
 	while (*s != '\0') {
 		LCD_drawchar(*s, c);
 		/*Desloca buffer nos dois lugares
