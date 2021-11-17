@@ -93,10 +93,10 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART2_UART_Init();
-  MX_SPI3_Init();
+  MX_SPI2_Init();
   /* USER CODE BEGIN 2 */
   //Inicialização da Instancia HLCD
-  hlcd.hspi=&hspi3;
+  hlcd.hspi=&hspi2;
   hlcd.CS_Port=NK_CS_GPIO_Port;
   hlcd.CS_Pin=NK_CS_Pin;
   hlcd.DC_Port=NK_DO_GPIO_Port;
@@ -104,28 +104,17 @@ int main(void)
 
   LCD5110_init(&hlcd);
 
+  LCD5110_set_XY(0, 0);
+  	  while( LCD5110_write_string("Micros é show - Testando")!=HAL_OK);
+  	  while( LCD5110_set_XY(0, 4)!=HAL_OK);
+  	while(LCD5110_write_char('x', 0)!=HAL_OK);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-		LCD5110_set_XY(0, 0);
-	  	LCD5110_write_string("Micros é show - Testando ");
-	  	LCD5110_set_XY(0, 4);
-	  	LCD5110_write_char('a',1);
-	  	LCD5110_write_char('b',0);
-		LCD5110_write_char('c',1);
-	  	HAL_Delay(DISP_DELAY);
-	  	LCD5110_clear();
-    	 LCD5110_set_XY(0, 3);
-	   	LCD5110_write_char('m',1);
-	  	  	LCD5110_write_char('i',0);
-	  		LCD5110_write_char('c',1);
-	  		LCD5110_write_char('r',1);
-	  		LCD5110_write_char('o',0);
-	  		LCD5110_write_char('s',1);
-	  	  	HAL_Delay(DISP_DELAY);
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
