@@ -26,6 +26,11 @@ typedef struct
 	GPIO_TypeDef* DC_Port; //!Porta do pino CS
 	uint16_t DC_Pin; //!Pino do CS
 
+	void (*TxCpltCallback)(SPI_HandleTypeDef *hspi);
+	/*
+	 * usuário pode apontar para a função de callback que quiser
+	 * no Tx
+	 */
 }LCD_HandleTypeDef;
 
 #define LCD_CS 	12 		//CE
@@ -90,6 +95,8 @@ typedef struct
 #define SPI_TIMEOUT 30000
 
 void LCD5110_init(LCD_HandleTypeDef *hlcd5110);
+
+void LCD5110_set_callback (void *callback(SPI_HandleTypeDef *hspi));
 
 HAL_StatusTypeDef LCD_write_bloque(BufferCompartilhado_t *b, uint8_t mode);
 
