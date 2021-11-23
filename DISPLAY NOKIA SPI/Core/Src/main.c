@@ -101,17 +101,18 @@ int main(void)
   hlcd.CS_Pin=NK_CS_Pin;
   hlcd.DC_Port=NK_DO_GPIO_Port;
   hlcd.DC_Pin=NK_DO_Pin;
+  hlcd.modo = LCD_IT;
 
   LCD5110_init(&hlcd);
 
   LCD5110_set_XY(0, 0);
-  	  while( LCD5110_write_string("Micros é show - Testando")!=HAL_OK);
-  	  while( LCD5110_set_XY(0, 4)!=HAL_OK);
+  	while( LCD5110_write_string("Micros é show - Testando")!=HAL_OK);
+  	while( LCD5110_set_XY(0, 4)!=HAL_OK);
   	  HAL_Delay(3000);
   	while(LCD5110_write_char('x', 0)!=HAL_OK);
-  	 HAL_Delay(3000);
+  	  HAL_Delay(3000);
   	while( LCD5110_clear()!=HAL_OK);
-  	 while( LCD5110_set_XY(0, 0)!=HAL_OK);
+  	while( LCD5110_set_XY(0, 0)!=HAL_OK);
   	while(LCD5110_write_block(liber_bmp3, TAM_TELA)!=HAL_OK);
 
   /* USER CODE END 2 */

@@ -1,5 +1,4 @@
 #include "stm32f4xx_hal.h"
-
 typedef enum {B_FREE=0,B_BUSY} BufStatus_t;
 
 typedef struct{
@@ -8,9 +7,18 @@ typedef struct{
 	uint16_t ocupacao;
 }BufferCompartilhado_t;
 
+typedef enum{
+	LCD_BLOCK, LCD_IT, LCD_DMA
+}LCD_ModeTypeDef;
+
 typedef struct
 {
 	SPI_HandleTypeDef *hspi; //!Handle da SPI utilizada
+
+	LCD_ModeTypeDef modo; //! Modo de operação do SPI
+	/*
+	 * (modo de op. pode ser bloqueante, por interrupção ou por dma)
+	 */
 
 	GPIO_TypeDef* CS_Port; //!Porta do pino CS
 	uint16_t CS_Pin; //!Pino do CS
@@ -19,8 +27,6 @@ typedef struct
 	uint16_t DC_Pin; //!Pino do CS
 
 }LCD_HandleTypeDef;
-
-
 
 #define LCD_CS 	12 		//CE
 #define LCD_RST 10 		//RST
@@ -81,11 +87,15 @@ typedef struct
 #define LCD_TEMPERATURA 0x02
 #define LCD_VALOR_BIAS 0x13
 
+#define SPI_TIMEOUT 30000
+
 void LCD5110_init(LCD_HandleTypeDef *hlcd5110);
 
-void LCD_write_b(uint8_t *data, uint16_t tam, uint8_t mode);
+HAL_StatusTypeDef LCD_write_bloque(BufferCompartilhado_t *b, uint8_t mode);
 
-HAL_StatusTypeDef LCD_write(BufferCompartilhado_t *b, uint8_t mode);
+HAL_StatusTypeDef LCD_write_IT(BufferCompartilhado_t *b, uint8_t mode);
+
+HAL_StatusTypeDef LCD_write_DMA(BufferCompartilhado_t *b, uint8_t mode);
 
 void LCD_drawchar(char c, uint8_t *dat);
 

@@ -19,6 +19,9 @@ static BufferCompartilhado_t buf;
 
 static BufferCompartilhado_t *buff_atual;
 
+//ponteiro para função LCD_Write
+static HAL_StatusTypeDef (*LCD_write)(BufferCompartilhado_t *b, uint8_t mode);
+
 uint8_t telaLimpa[TAM_TELA];
 /*array para limpar tela
  * é preenchida no INIT
@@ -31,6 +34,67 @@ void LCD5110_LCD_write_byte(unsigned char dat, unsigned char LCD5110_MOde);
 //Define the hardware operation function
 void LCD5110_RST(unsigned char temp);
 
+HAL_StatusTypeDef LCD_write_bloque(BufferCompartilhado_t *b, uint8_t mode) //manda UM BLOCO (de qqr tamanho) PARA O DISPLAY
+{
+	HAL_StatusTypeDef status;
+
+	//Ativa (desliga) CS
+	HAL_GPIO_WritePin(lcd->CS_Port, lcd->CS_Pin, 0);
+
+	//Seleção dados/comando
+	HAL_GPIO_WritePin(lcd->DC_Port, lcd->DC_Pin, mode);
+
+	HAL_SPI_Transmit(lcd->hspi, b->dado, b->ocupacao, SPI_TIMEOUT);
+
+	//Fim da transf.
+	HAL_GPIO_WritePin(lcd->CS_Port, lcd->CS_Pin, 1);
+
+	b->estado=B_FREE;
+	b->dado = buffer;
+	return status;
+
+}
+HAL_StatusTypeDef LCD_write_IT(BufferCompartilhado_t *b, uint8_t mode) //manda UM BLOCO (de qqr tamanho) PARA O DISPLAY
+{
+	HAL_StatusTypeDef status;
+
+	if (lcd->hspi->State != HAL_SPI_STATE_READY)
+		return HAL_BUSY;
+	buff_atual = b;
+
+	//Ativa (desliga) CS (chipselect)
+	HAL_GPIO_WritePin(lcd->CS_Port, lcd->CS_Pin, 0);
+	//Seleção dados/comando
+	HAL_GPIO_WritePin(lcd->DC_Port, lcd->DC_Pin, mode);
+
+	//envia dado
+	status = HAL_SPI_Transmit_IT(lcd->hspi, b->dado, b->ocupacao);
+
+	return status;
+
+}
+
+
+HAL_StatusTypeDef LCD_write_DMA(BufferCompartilhado_t *b, uint8_t mode) //manda UM BLOCO (de qqr tamanho) PARA O DISPLAY
+{
+	HAL_StatusTypeDef status;
+
+	if (lcd->hspi->State != HAL_SPI_STATE_READY)
+		return HAL_BUSY;
+	buff_atual = b;
+
+	//Ativa (desliga) CS (chipselect)
+	HAL_GPIO_WritePin(lcd->CS_Port, lcd->CS_Pin, 0);
+	//Seleção dados/comando
+	HAL_GPIO_WritePin(lcd->DC_Port, lcd->DC_Pin, mode);
+
+	//envia dado
+	status = HAL_SPI_Transmit_IT(lcd->hspi, b->dado, b->ocupacao);
+
+	return status;
+
+}
+
 void LCD5110_init(LCD_HandleTypeDef *hlcd5110) {
 	lcd = hlcd5110;
 	//preenche com zeros array para clearScream
@@ -41,6 +105,9 @@ void LCD5110_init(LCD_HandleTypeDef *hlcd5110) {
 	buf.dado = buffer;
 	buf.ocupacao = 0;
 	buf.estado = B_FREE;
+
+	//!Aponta a função write para a operação específica
+	LCD_write = LCD_write_IT;
 
 	HAL_GPIO_WritePin(lcd->DC_Port, lcd->DC_Pin, 1);
 	HAL_GPIO_WritePin(lcd->CS_Port, lcd->CS_Pin, 1);
@@ -64,42 +131,6 @@ void LCD5110_init(LCD_HandleTypeDef *hlcd5110) {
 	LCD_write(&buf, LCD_COMMAND);
 	while (buf.estado == B_BUSY); //garanto que terminei a config ao final
 }
-
-void LCD_write_b(uint8_t *data, uint16_t tam, uint8_t mode) //manda UM BLOCO (de qqr tamanho) PARA O DISPLAY
-{
-	//Ativa (desliga) CS
-	HAL_GPIO_WritePin(lcd->CS_Port, lcd->CS_Pin, 0);
-
-	//Seleção dados/comando
-	HAL_GPIO_WritePin(lcd->DC_Port, lcd->DC_Pin, mode);
-
-	HAL_SPI_Transmit(lcd->hspi, data, tam, 30000);
-
-	//Fim da transf.
-	HAL_GPIO_WritePin(lcd->CS_Port, lcd->CS_Pin, 1);
-
-}
-
-HAL_StatusTypeDef LCD_write(BufferCompartilhado_t *b, uint8_t mode) //manda UM BLOCO (de qqr tamanho) PARA O DISPLAY
-{
-	HAL_StatusTypeDef status;
-
-	if (lcd->hspi->State != HAL_SPI_STATE_READY)
-		return HAL_BUSY;
-	buff_atual = b;
-
-	//Ativa (desliga) CS (chipselect)
-	HAL_GPIO_WritePin(lcd->CS_Port, lcd->CS_Pin, 0);
-	//Seleção dados/comando
-	HAL_GPIO_WritePin(lcd->DC_Port, lcd->DC_Pin, mode);
-
-	//envia dado
-	status = HAL_SPI_Transmit_IT(lcd->hspi, b->dado, b->ocupacao);
-
-	return status;
-
-}
-
 
 void LCD_drawchar(char c, uint8_t *dat) //desenha o char e hospeda em dat
 {
