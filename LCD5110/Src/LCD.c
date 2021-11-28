@@ -148,12 +148,6 @@ void LCD5110_init(LCD_HandleTypeDef *hlcd5110) {
 	while (buf.estado == B_BUSY); //garanto que terminei a config ao final
 }
 
-//!função para dizer a biblioteca qual função completa o callback do spi
-void LCD5110_set_callback (void *callback(SPI_HandleTypeDef *hspi))
-{
-	lcd->TxCpltCallback=callback;
-}
-
 void LCD_drawchar(char c, uint8_t *dat) //desenha o char e hospeda em dat
 {
 	uint8_t i; //indice do desenho
@@ -308,7 +302,7 @@ void LCD5110_LCD_delay_ms(unsigned int nCount) {
 		;
 }
 
-void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi) {
+void LCD5110_TxCpltCallback(SPI_HandleTypeDef *hspi) {
 	if (hspi->Instance == lcd->hspi->Instance) //se for o SPI usado no lcd
 			{
 		//Fim da transf.
@@ -317,11 +311,4 @@ void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi) {
 		buf.dado = buffer;
 	}
 
-	/*"Concatena" a função de callback com outra especificada
-	 * para poder complementar as ações feitas ao completar
-	 * a transmissão, assim o callback não é inutilizado para uso
-	 * fora da biblioteca.
-	 */
-	if (lcd->TxCpltCallback!=NULL)
-		(*(lcd->TxCpltCallback))(hspi);
 }
