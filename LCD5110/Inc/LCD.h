@@ -1,19 +1,28 @@
 #ifndef __LCD_H__
 #define __LCD_H__
-
+/*<<<<<<<<<<<<<<<<<<<<<<<<INCLUDES DISPLAY>>>>>>>>>>>>>>>>>>>>>>>>*/
+/* include para utilizar
+SPI_HandleTypeDef...*/
 #include "stm32f4xx_hal.h"
+
+
+/*<<<<<<<<<<<<<<<<<<<<<<<<TYPEDEFS DISPLAY>>>>>>>>>>>>>>>>>>>>>>>>*/
+///!tipo do status do buffer
 typedef enum {B_FREE=0,B_BUSY} BufStatus_t;
 
+///!struct do status do buffer
 typedef struct{
 	uint8_t *dado;
 	BufStatus_t estado;
 	uint16_t ocupacao;
 }BufferCompartilhado_t;
 
+///!struct do modo de operação da tranmissão LCD
 typedef enum{
 	LCD_BLOCK, LCD_IT, LCD_DMA
 }LCD_ModeTypeDef;
 
+///!struct do handle LCD
 typedef struct
 {
 	SPI_HandleTypeDef *hspi; //!Handle da SPI utilizada
@@ -29,6 +38,9 @@ typedef struct
 	GPIO_TypeDef* DC_Port; //!Porta do pino CS
 	uint16_t DC_Pin; //!Pino do CS
 
+	GPIO_TypeDef* RST_Port; //!Porta do pino RST
+	uint16_t RST_Pin; //!Pino do RST
+
 	void (*TxCpltCallback)(SPI_HandleTypeDef *hspi);
 	/*
 	 * usuário pode apontar para a função de callback que quiser
@@ -36,37 +48,36 @@ typedef struct
 	 */
 }LCD_HandleTypeDef;
 
-#define LCD_CS 	12 		//CE
-#define LCD_RST 10 		//RST
-/*
- * MO E SCK são pinos da SPI
- */
-#define LCD_DC	14 		//DO
-#define PORT	GPIOB	//GPIO onde está o display
-#define LEFT 0
-#define RIGHT 9999
-#define CENTER 9998
 
-#define false 0
-#define true 1
-
-#define TAM_MAX_STRING 100 //num. máximo de caract. para mandar string (arbitrário)
+/*<<<<<<<<<<<<<<<<<<<<<<<<DEFINES DISPLAY>>>>>>>>>>>>>>>>>>>>>>>>*/
+///< num. máximo de caract. para mandar string (arbitrário)
+#define TAM_MAX_STRING 100
 #define TAM_TELA ((uint16_t) 504)
 #define TAM_BUFF  ((uint16_t) 504)
-#define LARG_CHAR 6 //largura de bytes de um caract
+///< largura de bytes de um caract
+#define LARG_CHAR 6
 
-#define LCD_DATA 1 //informação	a ser mandada
-#define LCD_COMMAND 0 //comando a ser mandado
+///< informação	a ser mandada
+#define LCD_DATA 1
+///< comando a ser mandado
+#define LCD_COMMAND 0
 
-#define X_ADDR_MASK 0x7f   //mask de 7 bits
-#define Y_ADDR_MASK 0x07   //mask de 3 bits
+//< mask de 7 bits
+#define X_ADDR_MASK 0x7f
+///< mask de 3 bits
+#define Y_ADDR_MASK 0x07
 
+/*defines para setxy*/
 #define PCD8544_SETYADDR 0x40
 #define PCD8544_SETXADDR 0x80
 
-//==================DEFINES DO DISPLAY====================
-//os seguintes defines foram retirados do seguinte repositório do GitHub:
-//https://github.com/adafruit/Adafruit-PCD8544-Nokia-5110-LCD-library/blob/master/Adafruit_PCD8544.h
+///< timeout para função bloqueante
+#define SPI_TIMEOUT 30000
+
+
+/*<<<<<<<<<<<<<<<<<<<<<<<<DEFINES INIT DISPLAY>>>>>>>>>>>>>>>>>>>>>>>>*/
+//os defines vieram de um repositório do GitHub:
+///LINK: https://github.com/adafruit/Adafruit-PCD8544-Nokia-5110-LCD-library/blob/master/Adafruit_PCD8544.h */
 #define LCD5110_POWERDOWN 0x04 ///< Function set, Power down mode
 #define LCD5110_ENTRYMODE 0x02 ///< Function set, Entry mode
 #define LCD5110_EXTENDEDINSTRUCTION                                            \
@@ -95,8 +106,8 @@ typedef struct
 #define LCD_TEMPERATURA 0x02
 #define LCD_VALOR_BIAS 0x13
 
-#define SPI_TIMEOUT 30000
 
+/*<<<<<<<<<<<<<<<<<<<<<<<<DECLARAÇÕES FUNÇÕES DISPLAY>>>>>>>>>>>>>>>>>>>>>>>>*/
 void LCD5110_init(LCD_HandleTypeDef *hlcd5110);
 
 HAL_StatusTypeDef LCD_write_bloque(BufferCompartilhado_t *b, uint8_t mode);
@@ -120,8 +131,6 @@ HAL_StatusTypeDef LCD5110_set_XY(uint8_t x, uint8_t y);
 HAL_StatusTypeDef LCD5110_write_string(char *s);
 
 void LCD5110_TxCpltCallback(SPI_HandleTypeDef *hspi);
-
-void LCD5110_LCD_delay_ms(unsigned int nCount);
 
 #endif
 

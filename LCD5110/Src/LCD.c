@@ -2,7 +2,10 @@
  * @file lcd.c
  * @author João Vitor de Souza
  *
- * @brief DRIVER LCD NOKIA5110 HAL E SPI
+ * @brief BIBLIOTECA LCD NOKIA5110 HAL E SPI, com possibilidade
+ * de escolha de modo de operação (DMA, IT, MODO BLOQUEANTE), e
+ * também a escolha do spi usado e os pinos para as funções CS
+ * e DC.
  */
 #include "stm32f4xx.h"
 #include "stm32f4xx_hal_spi.h"
@@ -11,7 +14,6 @@
 #include "LCD.h"
 #include "font.h"
 
-int scrbuf[504];
 static LCD_HandleTypeDef *lcd; //!handler display
 static uint8_t buffer[TAM_BUFF]; //!espaço de memória auxiliar
 
@@ -22,18 +24,19 @@ static BufferCompartilhado_t *buff_atual;
 //ponteiro para função LCD_Write
 static HAL_StatusTypeDef (*LCD_write)(BufferCompartilhado_t *b, uint8_t mode);
 
-uint8_t telaLimpa[TAM_TELA];
 /*array para limpar tela
  * é preenchida no INIT
  * não é const para poder receber assign
  */
+uint8_t telaLimpa[TAM_TELA];
 
-//Define the LCD Operation function
-void LCD5110_LCD_write_byte(unsigned char dat, unsigned char LCD5110_MOde);
 
-//Define the hardware operation function
-void LCD5110_RST(unsigned char temp);
-
+/**
+  * @brief  Manda informação por SPI no modo bloqueante
+  * @param  Struct do buffer com dado a ser mandado
+  * @param  Modo da mensagem (dado ou comando?)
+  * @retval HAL status
+  */
 HAL_StatusTypeDef LCD_write_bloque(BufferCompartilhado_t *b, uint8_t mode) //manda UM BLOCO (de qqr tamanho) PARA O DISPLAY
 {
 	HAL_StatusTypeDef status;
@@ -54,6 +57,13 @@ HAL_StatusTypeDef LCD_write_bloque(BufferCompartilhado_t *b, uint8_t mode) //man
 	return status;
 
 }
+
+/**
+  * @brief  Manda informação por SPI no modo interrupção
+  * @param  Struct do buffer com dado a ser mandado
+  * @param  Modo da mensagem (dado ou comando?)
+  * @retval HAL status
+  */
 HAL_StatusTypeDef LCD_write_IT(BufferCompartilhado_t *b, uint8_t mode) //manda UM BLOCO (de qqr tamanho) PARA O DISPLAY
 {
 	HAL_StatusTypeDef status;
@@ -74,7 +84,12 @@ HAL_StatusTypeDef LCD_write_IT(BufferCompartilhado_t *b, uint8_t mode) //manda U
 
 }
 
-
+/**
+  * @brief  Manda informação por SPI no modo DMA
+  * @param  Struct do buffer com dado a ser mandado
+  * @param  Modo da mensagem (dado ou comando?)
+  * @retval HAL status
+  */
 HAL_StatusTypeDef LCD_write_DMA(BufferCompartilhado_t *b, uint8_t mode) //manda UM BLOCO (de qqr tamanho) PARA O DISPLAY
 {
 	HAL_StatusTypeDef status;
@@ -89,12 +104,16 @@ HAL_StatusTypeDef LCD_write_DMA(BufferCompartilhado_t *b, uint8_t mode) //manda 
 	HAL_GPIO_WritePin(lcd->DC_Port, lcd->DC_Pin, mode);
 
 	//envia dado
-	status = HAL_SPI_Transmit_IT(lcd->hspi, b->dado, b->ocupacao);
+	status = HAL_SPI_Transmit_DMA(lcd->hspi, b->dado, b->ocupacao);
 
 	return status;
 
 }
 
+/**
+  * @brief  Inicializa o display com as configurações básicas e modo de operação SPI
+  * @param  Handler do display em questão
+  */
 void LCD5110_init(LCD_HandleTypeDef *hlcd5110) {
 	lcd = hlcd5110;
 	//preenche com zeros array para clearScream
@@ -111,9 +130,6 @@ void LCD5110_init(LCD_HandleTypeDef *hlcd5110) {
 	default:
 		LCD_write = LCD_write_bloque;
 		break;
-	case LCD_BLOCK:
-		LCD_write = LCD_write_bloque;
-		break;
 	case LCD_IT:
 		LCD_write = LCD_write_IT;
 		break;
@@ -128,10 +144,9 @@ void LCD5110_init(LCD_HandleTypeDef *hlcd5110) {
 	HAL_GPIO_WritePin(lcd->DC_Port, lcd->DC_Pin, 1);
 	HAL_GPIO_WritePin(lcd->CS_Port, lcd->CS_Pin, 1);
 
-	LCD5110_RST(0); //LCD_RST = 0;
-	LCD5110_LCD_delay_ms(10);
-	LCD5110_RST(1); //LCD_RST = 1;
-
+	HAL_GPIO_WritePin(lcd->RST_Port, lcd->RST_Pin, 0);
+	HAL_Delay(10);
+	HAL_GPIO_WritePin(lcd->RST_Port, lcd->RST_Pin, 1);
 
 	while(LCD5110_clear()!=HAL_OK);
 	buffer[0] = LCD5110_FUNCTIONSET | LCD5110_EXTENDEDINSTRUCTION; //x21
@@ -148,6 +163,11 @@ void LCD5110_init(LCD_HandleTypeDef *hlcd5110) {
 	while (buf.estado == B_BUSY); //garanto que terminei a config ao final
 }
 
+/**
+  * @brief  Desenha o caractere e bota em endereço
+  * @param  Caractere a ser desenhado
+  * @param  Endereço onde o desenho será hospedado
+  */
 void LCD_drawchar(char c, uint8_t *dat) //desenha o char e hospeda em dat
 {
 	uint8_t i; //indice do desenho
@@ -160,6 +180,12 @@ void LCD_drawchar(char c, uint8_t *dat) //desenha o char e hospeda em dat
 
 	}
 }
+
+/**
+  * @brief  Desenha o caractere INVERTIDO e bota em endereço
+  * @param  Caractere a ser desenhado
+  * @param  Endereço onde o desenho será hospedado
+  */
 void LCD_drawchar_inv(char c, uint8_t *dat) //desenha o char invertido
 {
 	uint8_t i; //indice do desenho
@@ -172,6 +198,13 @@ void LCD_drawchar_inv(char c, uint8_t *dat) //desenha o char invertido
 
 	}
 }
+
+/**
+  * @brief  Escreve caracter no display nokia LCD5110
+  * @param  Caractere a ser escrito
+  * @param  É invertido? (1- Sim, 0- Não)
+  * @retval HAL status
+  */
 HAL_StatusTypeDef LCD5110_write_char(unsigned char c, uint8_t invert) {
 	HAL_StatusTypeDef status;
 	uint8_t *caract; //onde sera hospedado o desenho do caract.]=
@@ -195,6 +228,11 @@ HAL_StatusTypeDef LCD5110_write_char(unsigned char c, uint8_t invert) {
 	return status;
 }
 
+/**
+  * @brief  Escreve string no display nokia LCD5110
+  * @param  Endereço da string a ser desenhada
+  * @retval HAL status
+  */
 HAL_StatusTypeDef LCD5110_write_string(char *s) {
 
 	uint16_t tam = 0;
@@ -221,7 +259,10 @@ HAL_StatusTypeDef LCD5110_write_string(char *s) {
 	return status; //se buffer n estiver ocupado, retorna estado
 }
 
-
+/**
+  * @brief  Limpa tela do display nokia 5110
+  * @retval HAL status
+  */
 HAL_StatusTypeDef LCD5110_clear()
 {
 	HAL_StatusTypeDef status;
@@ -236,9 +277,13 @@ HAL_StatusTypeDef LCD5110_clear()
 	status = LCD_write(&buf,LCD_DATA);
 			return status;
 }
-/*
- * Função para escrever imagens (blocos de bytes) direto
- */
+
+/**
+  * @brief  Escreve um bloco (imagem) no display
+  * @param  Endereço da imagem a ser desenhada
+  * @param  Tamanho da imagem
+  * @retval HAL status
+  */
 HAL_StatusTypeDef LCD5110_write_block(uint8_t *img, uint16_t tam)
 {
 	HAL_StatusTypeDef status;
@@ -253,6 +298,13 @@ HAL_StatusTypeDef LCD5110_write_block(uint8_t *img, uint16_t tam)
 	status=LCD_write(&buf,LCD_DATA);
 	return status; //se buffer n estiver ocupado, retorna estado
 }
+
+/**
+  * @brief  "Seta" a posição de escrita no display nokia 5110
+  * @param  Posição horizontal (x)
+  * @param  Posição horizontal (y)
+  * @retval HAL status
+  */
 HAL_StatusTypeDef LCD5110_set_XY(uint8_t x, uint8_t y) {
 	HAL_StatusTypeDef status;
 
@@ -272,36 +324,10 @@ HAL_StatusTypeDef LCD5110_set_XY(uint8_t x, uint8_t y) {
 	return status;
 }
 
-void LCD5110_LCD_write_byte(unsigned char dat, unsigned char mode) {
-	//Ativa (desliga) CS
-	HAL_GPIO_WritePin(lcd->CS_Port, lcd->CS_Pin, 0);
-
-	//Seleção dados/comando
-	HAL_GPIO_WritePin(lcd->DC_Port, lcd->DC_Pin, mode);
-
-	HAL_SPI_Transmit(lcd->hspi, &dat, 1, 30000);
-
-	//Fim da transf.
-	HAL_GPIO_WritePin(lcd->CS_Port, lcd->CS_Pin, 1);
-
-}
-
-
-void LCD5110_RST(unsigned char temp) {
-	if (temp)
-		PORT->ODR |= 1 << LCD_RST;
-	else
-		PORT->ODR &= ~(1 << LCD_RST);
-
-}
-
-void LCD5110_LCD_delay_ms(unsigned int nCount) {
-	unsigned long t;
-	t = nCount * 40000;
-	while (t--)
-		;
-}
-
+/**
+  * @brief  Callback da biblioteca que deve ser chamado no callback do "main.c"
+  * @param  Handler do spi para callback
+  */
 void LCD5110_TxCpltCallback(SPI_HandleTypeDef *hspi) {
 	if (hspi->Instance == lcd->hspi->Instance) //se for o SPI usado no lcd
 			{
